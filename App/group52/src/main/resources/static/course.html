@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Course Launcher</title>
+</head>
+
+<body>
+    <h2>Course Launcher</h2>
+    <label>User ID: <input id="userId" value="student-1"></label>
+    <button id="startCourse">Start External Course</button>
+    <div id="status"></div>
+
+    <script>
+        let sessionId = null;
+        let child = null;
+        let completedViaCallback = false;
+
+        document.getElementById("startCourse").addEventListener("click", async () => {
+            const userId = document.getElementById("userId").value || "student-1";
+            const body = { userId, courseId: "skillsbuild-demo", courseUrl: "/skillsbuild_simulator.html" };
+            const res = await fetch("/sessions/start", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+            const json = await res.json();
+            sessionId = json.sessionId;
+            document.getElementById("status").innerText = "Session started: " + sessionId;
+            child = window.open(json.courseUrlWithReturn, "_blank");
+            startChildWatch(userId);
+        });
+
+        window.addEventListener("message", (ev) => {
+            try {
+                if (!ev.data || ev.data.type !== "skillsbuild-complete") {
+                    return;
+                }
+            } catch (e) {
+                console.error(e);
+                return;
+            }
+            try {
+                if (ev.data.sessionId !== sessionId) {
+                    return;
+                }
+            } catch (e) {
+                console.error(e);
+                return;
+            }
+            completedViaCallback = true;
+            stopHeartbeat();
+            fetch("/sessions/complete?sessionId=" + sessionId, { method: "POST" });
+            document.getElementById("status").innerText = "Completed via callback";
+            try {
+                if (child) {
+                    child.close();
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        });
+
+        function startChildWatch(userId) {
+            const poll = setInterval(() => {
+                try {
+                    if (!child) {
+                        clearInterval(poll);
+                        stopHeartbeat();
+                        if (!completedViaCallback) {
+                            document.getElementById("status").innerText = "Child closed - waiting for server inactivity timeout";
+                        }
+                    }
+                } catch (e) {
+                    clearInterval(poll);
+                    console.error('child watch error', e);
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+
+</html>

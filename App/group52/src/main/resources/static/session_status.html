@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Session Status</title>
+	<style>
+		body {
+			font-family: Arial;
+			margin: 20px
+		}
+	</style>
+</head>
+
+<body>
+	<h2>Session Status</h2>
+	<label>Session ID: <input id="sessionId" value="1"></label>
+	<button id="start">Start Polling</button>
+	<button id="stop">Stop</button>
+	<pre id="out"></pre>
+
+	<script>
+		let poll = null;
+		document.getElementById("start").addEventListener("click", () => {
+			try {
+				if (poll) {
+					return;
+				}
+				poll = setInterval(fetchOne, 1000);
+				fetchOne();
+			} catch (e) {
+				console.error(e);
+			}
+		});
+		document.getElementById("stop").addEventListener("click", () => {
+			clearInterval(poll);
+			poll = null;
+		});
+
+		async function fetchOne() {
+			const id = document.getElementById("sessionId").value;
+			const res = await fetch("/sessions/" + encodeURIComponent(id));
+			if (res.status === 404) {
+				document.getElementById("out").innerText = "Not found";
+				return;
+			}
+			const j = await res.json();
+			document.getElementById("out").innerText = JSON.stringify(j, null, 2);
+		}
+	</script>
+</body>
+
+</html>

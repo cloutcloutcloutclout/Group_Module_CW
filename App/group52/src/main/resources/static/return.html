@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Return Callback</title>
+</head>
+
+<body>
+    <h3>Return / Callback Page</h3>
+    <p id="msg">Notifying parent...</p>
+    <script>
+        (function () {
+            const params = new URLSearchParams(location.search);
+            const sessionId = params.get("sessionId");
+            const userId = params.get("userId") || "student-1";
+            if (window.opener && !window.opener.closed) {
+                try {
+                    window.opener.postMessage({ type: "skillsbuild-complete", sessionId }, window.origin);
+                } catch (e) {
+                    console.error(e);
+                }
+                fetch("/sessions/complete?sessionId=" + sessionId, { method: "POST" })
+                    .finally(() => {
+                        document.getElementById("msg").innerText = "Notified parent and marked complete.";
+                        try {
+                            window.close();
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    });
+            } else {
+                fetch("/sessions/complete?sessionId=" + sessionId, { method: "POST" }).then(() => {
+                    document.getElementById("msg").innerText = "Marked complete on server. You may close this tab.";
+                });
+            }
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>SkillsBuild Simulator</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 20px
+        }
+    </style>
+</head>
+
+<body>
+    <h2>SkillsBuild Simulator</h2>
+    <p id="info"></p>
+    <p>Simulated course content running in another window.</p>
+    <p>Timer: <span id="timer">0</span> seconds</p>
+    <button id="finish">Finish Course (complete + return)</button>
+    <button id="pause">Pause Course</button>
+    <button id="resume" style="display:none">Resume Course</button>
+    <button id="close">Close Tab (no callback)</button>
+
+    <script>
+        const params = new URLSearchParams(location.search);
+        const sessionId = params.get("sessionId");
+        const returnUrl = params.get("returnUrl") || ("/return.html?sessionId=" + sessionId);
+        document.getElementById("info").innerText = "sessionId=" + sessionId + ", returnUrl=" + returnUrl;
+
+        let seconds = 0;
+        let tickTimer = null;
+        let userPaused = false;
+        function startTick() {
+            stopTick();
+            tickTimer = setInterval(() => {
+                seconds++;
+                document.getElementById("timer").innerText = seconds;
+            }, 1000);
+        }
+        function stopTick() {
+            if (tickTimer) {
+                clearInterval(tickTimer);
+                tickTimer = null;
+            }
+        }
+
+        const PING_MS = 5000;
+        let pingTimer = null;
+        function startPings() {
+            try {
+                if (window.opener && !window.opener.closed) {
+                    pingTimer = setInterval(() => {
+                        try {
+                            window.opener.postMessage({ type: "skillsbuild-ping", sessionId, seconds }, "*");
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    }, PING_MS);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        function stopPings() {
+            if (pingTimer) {
+                clearInterval(pingTimer);
+                pingTimer = null;
+            }
+        }
+
+        window.addEventListener("focus", () => {
+            try {
+                if (!userPaused && window.opener && !window.opener.closed) {
+                    window.opener.postMessage({ type: "skillsbuild-focus", sessionId }, "*");
+                }
+            } catch (e) {
+                console.error(e);
+            }
+            if (!userPaused) {
+                startTick();
+            }
+        });
+        window.addEventListener("blur", () => {
+            try {
+                if (!userPaused && window.opener && !window.opener.closed) {
+                    window.opener.postMessage({ type: "skillsbuild-unfocus", sessionId }, "*");
+                }
+            } catch (e) {
+                console.error(e);
+            }
+            if (!userPaused) {
+                stopTick();
+            }
+        });
+
+        window.addEventListener("message", (ev) => {
+            if (!ev.data) {
+                return;
+            }
+            try {
+                const d = ev.data;
+                if (d.type === "pause") {
+                    stopTick();
+                } else if (d.type === "resume") {
+                    startTick();
+                }
+            } catch (e) {
+                console.error("malformed message", e);
+            }
+        });
+
+        const HEARTBEAT_MS = 10000;
+        let heartbeatTimer = null;
+        function startChildHeartbeat() {
+            try {
+                if (!sessionId) {
+                    return;
+                }
+                heartbeatTimer = setInterval(() => {
+                    try {
+                        navigator.sendBeacon("/sessions/heartbeat?sessionId=" + encodeURIComponent(sessionId));
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }, HEARTBEAT_MS);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        function stopChildHeartbeat() {
+            if (heartbeatTimer) {
+                clearInterval(heartbeatTimer);
+                heartbeatTimer = null;
+            }
+        }
+        startChildHeartbeat();
+        startPings();
+        startTick();
+
+        window.addEventListener("beforeunload", () => {
+            try {
+                if (window.opener && !window.opener.closed) {
+                    window.opener.postMessage({ type: "skillsbuild-closed", sessionId }, "*");
+                }
+            } catch (e) {
+                console.error(e);
+            }
+            try {
+                navigator.sendBeacon("/sessions/heartbeat?sessionId=" + encodeURIComponent(sessionId));
+            } catch (e) {
+                console.error(e);
+            }
+            stopChildHeartbeat();
+        });
+
+        document.getElementById("finish").addEventListener("click", async () => {
+            try {
+                stopChildHeartbeat();
+                if (sessionId) {
+                    await fetch("/sessions/complete?sessionId=" + encodeURIComponent(sessionId), { method: "POST" });
+                }
+            } catch (e) {
+                console.error("complete failed", e);
+            }
+            location.href = returnUrl;
+        });
+        document.getElementById("pause").addEventListener("click", async () => {
+            try {
+                stopChildHeartbeat();
+                stopPings();
+                stopTick();
+                userPaused = true;
+                if (sessionId) {
+                    await fetch("/sessions/pause?sessionId=" + encodeURIComponent(sessionId), { method: "POST" });
+                }
+                document.getElementById("info").innerText = "Paused - sessionId=" + sessionId + ", returnUrl=" + returnUrl;
+                document.getElementById("resume").style.display = "inline-block";
+                document.getElementById("pause").disabled = true;
+            } catch (e) {
+                console.error("pause failed", e);
+            }
+        });
+        document.getElementById("resume").addEventListener("click", async () => {
+            try {
+                startChildHeartbeat();
+                startPings();
+                startTick();
+                userPaused = false;
+                if (sessionId) {
+                    await fetch("/sessions/resume?sessionId=" + encodeURIComponent(sessionId), { method: "POST" });
+                }
+                document.getElementById("info").innerText = "Resumed - sessionId=" + sessionId + ", returnUrl=" + returnUrl;
+                document.getElementById("resume").style.display = "none";
+                document.getElementById("pause").disabled = false;
+            } catch (e) {
+                console.error("resume failed", e);
+            }
+        });
+        document.getElementById("close").addEventListener("click", () => {
+            window.close();
+        });
+    </script>
+</body>
+
+</html>
