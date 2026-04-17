@@ -39,7 +39,8 @@ As **Member Seven**, I was responsible for implementing core user and social fea
 
 - **Account Management:** View, update, and delete account details.  
 - **Friends System:** View, search, and remove friends, along with profile privacy controls.  
-- **User Profile:** View and customise user profiles.  
+- **User Profile:** View and customise user profiles.
+- **Guild System:** View guilds, Join guilds, Guild privacy, Edit Guild member / bio / announcement / delete, Guild leaderboard.
 
 ---
 
