@@ -1,59 +1,106 @@
-## Running
-* Dependencies: Change it to your datasource or keep as h2
-* Application properties: Enter your own Keys, Secret ID, 
+## 🚀 Running the Application
+- **Dependencies:** Configure your preferred data source or use the default H2 database.  
+- **Application Properties:** Provide the necessary API keys and secret credentials before running the application.  
 
+---
 
-## Overview
+## 📌 Overview  
+This project was developed as part of a second-year, second-semester group software engineering module. The objective was to create an integrated learning platform utilising Selenium for browser-based functionality. The project followed **Agile Scrum methodology**, simulating a real-world development environment with collaborative teamwork, iterative development, and fixed deadlines.
 
-Group software engineering project module for second semester of second year,
+---
 
-This entailed a multitude of features each of our 7 members did, except one useless guy who did nothing hes failing second year LOL!,
-we used InteliJ IDEA using spring boot, some bootstrap, JS, API's etcetc. 
+## 🛠️ Tech Stack  
 
-### Scrum
-Used scrum methodology for this module to ensure that we see how this methodology works and apply it into a module which simulates a real job, real deadlines.
-(Basically future work prep and improving skills working with devs as a TEAM)
+**Frontend:**  
+- HTML, CSS, Bootstrap, JavaScript, TypeScript, JSP  
 
-### Specifics
-(USELESS MEMBER) member one - (TTS -> did not merge, only one feature for 2 sprints (3 months) FAILING BUM!!)
+**Backend:**  
+- Java, Spring Boot (MVC), REST APIs  
+- H2 Database  
+- OAuth integration (Google, GitHub)  
+- External APIs (GenAI, ElevenLabs)  
 
-### Actual members, we did 2 user stories -> 1 user story per sprint was the minimum for the module specifics:
+---
 
-member two - (Login / Register, oAuth for google and github, Admin comment management, ratings and comments)
-member three - (Rewards and incentives (badges), course completion goal setting, course start time, course finish time)
-member four - (Personalised stats (GenAI API), Automate courses on dashboard, Dashboard, Leaderboard)
-member five - (Daily streak, Search and filter courses, Trending courses, Notifcations)
-member six - (Admin messaging inbox, User feedback form)
+## 👥 Team Contributions  
 
-### Myself
+- **Member 1:** Text-to-Speech functionality using ElevenLabs API and JavaScript-based text extraction (not merged into final build).  
+- **Member 2:** Authentication system (Login/Register), OAuth integration (Google, GitHub), admin comment management, ratings, and comments.  
+- **Member 3:** Rewards system (badges), course completion tracking, goal setting, and time tracking (start/finish).  
+- **Member 4:** Personalised statistics using GenAI API, automated dashboard content, dashboard development, and leaderboard implementation.  
+- **Member 5:** Daily streak system, course search and filtering, trending courses, and notifications.  
+- **Member 6:** Admin messaging inbox and user feedback system.  
 
-Calling myself member seven here, I did:
-* Account -> View account details, Change account details, delete account
-* Friends -> View existing friends, Remove friends, Search for friends, Friend profile privacy
-* Profile -> View profile, customise / edit profile
+---
 
-Guilds
--
-Guilds was a more complex user story,
+## 👤 Individual Contribution  
 
-Joining a guild -> Code if guild is set to private by join, join with a button if guild is public by join and has a public privacy setting
-Guild profile -> Customised guild profile page, shows guild total points, guild memeber list with points individually, guild member roles, options to leave or edit guild, invite code
+As **Member Seven**, I was responsible for implementing core user and social features:
 
-### Roles
-Three roles:
-MASTER - Owner of guild, cannot leave guild, can see invite code, can see edit guild
-CAPTAIN - Second in hierarchy, can see the invite code, cannot see edit guild, can leave
-ROOKIE - Default, cant see invite code, can leave
+- **Account Management:** View, update, and delete account details.  
+- **Friends System:** View, search, and remove friends, along with profile privacy controls.  
+- **User Profile:** View and customise user profiles.  
 
+---
 
-### Leaderboard
-Inside the leaderboard there is a guild list under the user leaderboard as an extension for the competitive vibes, u need to join to participate.
-Guild points are updated based on any changes to a user or the guild instantly and updates the leaderboard as well.
+## 🏰 Guild System  
 
-### Edit guild
-If you're the master you can edit guild with customisation or names etc, you can promote people to captain or master which then switches you to CAPTAIN.
-Also the option to delete guild, instantly removes from the guild list and leaderboard using repository + model coding.
+The **Guild system** was a key and complex feature designed to support user collaboration and competition.
 
-#### Final thoughts
-10/10 module in learning teamwork with devs and improving coding knowledge.
-no more yap
+### Core Functionality  
+- **Guild Joining:**  
+  - Public guilds can be joined directly via a button.  
+  - Private guilds require an invite code.  
+
+- **Guild Profile:**  
+  - Customised interface displaying:
+    - Total guild points  
+    - Member list with individual scores  
+    - Member roles  
+  - Options to leave or manage the guild  
+
+---
+
+## 🧩 Role Management  
+
+Three hierarchical roles were implemented:
+
+- **MASTER (Owner):**  
+  - Full control over guild management  
+  - Can edit guild settings and roles  
+  - Cannot leave the guild  
+
+- **CAPTAIN:**  
+  - Can view invite code  
+  - Cannot edit guild settings  
+  - Can leave the guild  
+
+- **ROOKIE:**  
+  - Default role  
+  - Cannot view invite code  
+  - Can leave the guild  
+
+---
+
+## 🏆 Leaderboard System  
+- Integrated a **guild leaderboard** alongside the individual user leaderboard.  
+- Users must join a guild to participate.  
+- Guild points are dynamically updated based on user activity.  
+- Changes are reflected instantly using repository and model-layer logic.  
+
+---
+
+## ⚙️ Guild Management  
+- Guild Masters can:
+  - Edit guild name, description, and announcements  
+  - Promote members (including transferring ownership)  
+  - Delete the guild  
+
+- **Guild Deletion:**  
+  - Instantly removes the guild from the system  
+  - Updates all related data, including leaderboard entries, in real time  
+
+---
+
+## 📈 Final Reflection  
+This project provided valuable experience in applying Agile Scrum practices within a team environment, improving both collaborative development skills and technical proficiency in full-stack application design.
